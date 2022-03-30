@@ -33,16 +33,16 @@ On the functional level, there are two basic categorization - User authenticatio
   -  example, The URL `https://github.com/jahandaniyal` is shortened to `<BASE_URL>/shortly/XvBaW`  
   -  If the same long URL is provided again (perhaps by another User) then the service will return existing short URL. 
   -  Expiration Time:
-    -  Users can specify expiration time (default is 30 Days, if it is not provided by the user)
-  -  Custom short link
-    -  Must be Unique and length limitation of 3 to 10 characters
-    -  If custom short link is already used by, then the User needs to select another one
-    -  Successful creation if Unique : example, `<BASE_URL>/shortly/danny` (Here, the custom short link is 'danny')
-    -  Same expiration, and url reuse rules apply to custom short links as well
-  -  Endpoint:
-    -  `<AUTH_SERVICE_BASE_URL>/api/shortenurl/{id}`
-    -  This endpoint is only accessible through User Authentication Service
-    -  Can only be accessed by Authenticated Users
+  -  Users can specify expiration time (default is 30 Days, if it is not provided by the user)
+- Custom short link
+  -  Must be Unique and length limitation of 3 to 10 characters
+  -  If custom short link is already used by, then the User needs to select another one
+  -  Successful creation if Unique : example, `<BASE_URL>/shortly/danny` (Here, the custom short link is 'danny')
+  -  Same expiration, and url reuse rules apply to custom short links as well
+- Endpoint
+  -  `<AUTH_SERVICE_BASE_URL>/api/shortenurl/{id}`
+  -  This endpoint is only accessible through User Authentication Service
+  -  Can only be accessed by Authenticated Users
 
 ### Short URL Redirection
 - If a user visits a short url, this service will fetch the long URL from mongoDB and redirect the user to this long URL
