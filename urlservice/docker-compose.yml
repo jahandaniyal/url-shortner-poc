@@ -1,0 +1,29 @@
+app:
+  build: .
+  command: python -u app.py
+  environment:
+    - MONGO_HOST=url_app_mongodb
+    - MONGO_INITDB_DATABASE=url_db
+    - MONGO_INITDB_ROOT_USERNAME=root
+    - MONGO_INITDB_ROOT_PASSWORD=pass
+  container_name: url_service
+  ports:
+    - "5000:5000"
+  volumes:
+    - .:/app
+  links:
+    - db
+
+db:
+  image: mongo:latest
+  hostname: url_app_mongodb
+  container_name: url_service_db
+  environment:
+    - MONGO_HOST=url_app_mongodb
+    - MONGO_INITDB_DATABASE=url_db
+    - MONGO_INITDB_ROOT_USERNAME=root
+    - MONGO_INITDB_ROOT_PASSWORD=pass
+  volumes:
+    - ./init-db.js:/docker-entrypoint-initdb.d/init-db.js:ro
+  ports:
+    - 27017:27017
