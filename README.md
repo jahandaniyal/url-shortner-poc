@@ -5,9 +5,30 @@
 ![asd drawio (2)](https://user-images.githubusercontent.com/4581090/160974118-0b572c8a-0906-4520-bc20-33199f218704.png)
 
 
-## Functional Features
+# Features
 
 On the functional level, there are two basic categorization - User authentication service, and Short URL Creation service.
+
+## API Definitions
+- This project uses REST APIs to create short URLs and redirect short URL to original URL.
+
+### Create Short URL
+- Allowed methods - [POST]
+- A valid request must contain the following parameters in the request body.
+  -  _**URL [String]:**_ Original URL we want to shorten. 
+  -  _**alias [String]:**_ Custom Link for the shortened URL. Must be unique and between 3 to 10 characters in length. Example - `danny`
+  -  _**expiration_date [ISO 8601 Format datetime object]:**_ Date of expiry of the Shortened URL.  Default is current time + 30 days (if no expiration date is provided).
+- Returns:
+  - _**shortened-url [String]:**_ Short URL for redirection to original URL
+  - _**created_at [ISO 8601 Format datetime object]:**_ The time of creation of this shortened URL
+  - _**expiration_date [ISO 8601 Format datetime object]:**_ The time of expiry of this shortened URL
+
+### Redirection URL (Shortened URL)
+- Allowed methods [GET]
+- Parameters:
+  - _**shortened URL key/ID [String]:**_ Example, `<BASE_URL>/shortly/XvBaW` here the Key is `XvBaW`. 
+- Returns:
+  - _**HTTPResponse:**_ Redirects to the original Link mapped to this shortened URL key/id.
 
 ## User Authentication Service
 - Django application - Handles User CRUD operation. 
@@ -15,13 +36,13 @@ On the functional level, there are two basic categorization - User authenticatio
 - Authentication - Using JSON Web Tokens.
 
 ### USER Endpoints
-* /api/token/
+* **/api/token/**
    * POST
-* /api/register/
+* **/api/register/**
    * POST
-* /api/user/{id}
+* **/api/user/{id}**
    * GET, POST, PUT, DELETE
-* /api/shortenurl/
+* **/api/shortenurl/**
    * POST
 
 ### User Model
@@ -32,8 +53,8 @@ On the functional level, there are two basic categorization - User authenticatio
   - Short URL Creation endpoint is only available to authenticated users. 
   - Authentication handled by the `User Authentication Service`
   - Database - MongoDB 
-## Features
-### Create a Short URL
+### Features
+#### Create a Short URL
 - Create a short link given any link of arbitrary length 
   -  example, The URL `https://github.com/jahandaniyal` is shortened to `<BASE_URL>/shortly/XvBaW`  
   -  If the same long URL is provided again (perhaps by another User) then the service will return existing short URL. 
@@ -49,14 +70,14 @@ On the functional level, there are two basic categorization - User authenticatio
   -  This endpoint is only accessible through User Authentication Service
   -  Can only be accessed by Authenticated Users
 
-### Short URL Redirection
+#### Short URL Redirection
 - If a user visits a short url, this service will fetch the long URL from mongoDB and redirect the user to this long URL
 - Endpoint:
   -  `<BASE_URL>/shortly/{id}`
   -  This endpoint is directly accessible by the User (no need to go through Authservice)
   -  Publicly accessible.
 
-### Reusing short URL ID/keys
+#### Reusing short URL ID/keys
 - We want to re-use the keys/ids which have expired. One way to find out is by pooling the DB occasionally and checking for expired links.
 - Another approach would be to check anytime someone tries use a Short URL. If it has expired then we inform the User and recover the URL key for future use.
   - This POC uses the later approach.
@@ -64,12 +85,12 @@ On the functional level, there are two basic categorization - User authenticatio
 ### Key Generation
 - Key consist of fixed length of ASCII-letter combinations (For example, 52 ASCII char [a-z,A-z] of length 5: aaaaa-ZZZZZ)
 - DB is pre-populated with a sub-set of all possible combinations using a utility script.
-  - Pre-poluation is randomised so `aaa` and `aab` are not consecutive entries.
+  - Pre-populuation process is randomised so `aaa` and `aab` are not consecutive entries.
   - Batch pre-population also helps when we want to scale our system. If we run out of keys, then we just create another cluster with a different sub-set of ASCII chars.
 - Randomization of keys ensure that the generated short URLs are not guessable.
   
    
-### Model
+### Short URL Model
 ![image](https://user-images.githubusercontent.com/4581090/160886547-65011216-2224-4c01-9488-25375aba4a7d.png)
 
 ## Monitoring Services
