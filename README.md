@@ -7,7 +7,11 @@
 
 # Features
 
-On the functional level, there are two basic categorization - User authentication service, and Short URL Creation service.
+- On the functional level, there are two basic categorization - User authentication service, and Short URL Creation service.
+- JWT Token based authentication
+- User Management API to create new users
+- A default Admin `{'name': 'admin', 'password': '12345'}` is created automatically during build (only for local testing purposes).
+- Targets in Makefile to ease local development - more details in the Local Development Setup section.
 
 ## API Definitions
 - This project uses REST APIs to create short URLs and redirect short URL to original URL.
@@ -97,3 +101,67 @@ On the functional level, there are two basic categorization - User authenticatio
 - Using Prometheus and Grafana
 - Can be deployed on the Kubernetes cluster or use cloud managed Kubernetes services like Google Kubernetes Engine. 
 - Monitor resource consumption and load metrics of each node in the cluster.
+
+
+## Local Development Setup
+- Uses Docker for building and running the applications.
+- Use Make to build, run, stop, and clean the local development environment (assumes a linux-like environment - Tested on ubuntu).
+- build - This target will build the docker containers, install all dependencies in requirements.txt and make the initial migrations to the DB. 
+   - `make build` or `sudo make build` depending on how docker, docker-compose was installed on the OS.
+- run - Run the server for testing locally.
+   - `make run`
+- stop - Stops all running docker containers related to this project.
+   - `make stop`
+- clean - Removes virtualenv and temporary files.
+   - `make clean`
+
+## Running Locally
+
+### Endpoints
+* **/api/token/**
+   * POST
+* **/api/register/**
+   * POST
+* **/api/user/{id}**
+   * GET, POST, PUT, DELETE
+* **/api/shortenurl/**
+   * POST
+* **/shortly/{id}**
+  * GET
+   
+### Create an Admin
+* Ideally, you would want to create a SuperUser/Admin for your application. This is already done in `build` step.
+   * A default Admin `{'name': 'admin', 'password': '12345'}` with these credentials is created for testing.
+   
+### Create new users:
+* Use API endpoint `AUTH_SERVICE_BASE_URL/api/register/` to create a new user. Where `AUTH_SERVICE_BASE_URL` could be for example - `http://127.0.0.1:8000/`
+   * Body structure is similar to - `{"name": "user1", "password": "123abc#$%"}`. Remember your password obviously! 
+
+### Get a Web Token
+* Use API endpoint `AUTH_SERVICE_BASE_URL/api/token/` to get 'access' and 'refresh' token. 
+   * Body - `{"name": "user1", "password": "123abc#$%"}`.
+
+### Get User Info
+*  Use API endpoint `AUTH_SERVICE_BASE_URL/user/{id}/` to fetch information about the User. You will need 'access' token from the previous step.   
+   * Headers - Authorization: Bearer <ACCESS_TOKEN>
+
+### Create short URL
+* Use API endpoint `AUTH_SERVICE_BASE_URL/api/shortenurl/` to create a short URL given a Long URL. Optionally provide - Custom Link and expiration date in the request body.
+* User Authorization header is required for this operation.
+  * Body -  Example `{
+      "url": "https://github.com/jahandaniyal/url-shortner-poc/",
+      "alias": "danny",
+      "expiration_date": "2022-04-30T04:58:34Z"
+  } `
+  * Headers - Authorization: Bearer <ACCESS_TOKEN>
+* Returns:
+  * _**shortened-url [String]:**_ Short URL for redirection to original URL
+  * _**created_at [ISO 8601 Format datetime object]:**_ The time of creation of this shortened URL
+  * _**expiration_date [ISO 8601 Format datetime object]:**_ The time of expiry of this shortened URL
+  
+
+### Short URL redirection
+* Use API endpoint `BASE_URL/shortly/{id}`. No access token required.
+* Returns:
+  * _**HTTPResponse:**_ Redirection to the original link.
+ 
