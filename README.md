@@ -1,5 +1,10 @@
 # url-shortner-poc
 
+# Proposed Architecture
+
+![asd drawio (2)](https://user-images.githubusercontent.com/4581090/160974118-0b572c8a-0906-4520-bc20-33199f218704.png)
+
+
 ## Functional Features
 
 On the functional level, there are two basic categorization - User authentication service, and Short URL Creation service.
@@ -67,3 +72,7 @@ On the functional level, there are two basic categorization - User authenticatio
 ### Model
 ![image](https://user-images.githubusercontent.com/4581090/160886547-65011216-2224-4c01-9488-25375aba4a7d.png)
 
+## Monitoring Services
+- Using Prometheus and Grafana
+- Can be deployed on the Kubernetes cluster or use cloud managed Kubernetes services like Google Kubernetes Engine. 
+- Monitor resource consumption and load metrics of each node in the cluster.
